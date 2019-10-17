@@ -1,0 +1,28 @@
+// CORE
+name                            : Total.js
+author                          : M ABD AZIZ ALFIAN (https://github.com/aalfiann)
+version                         : 1.0.0
+nosql_cleaner                   : true
+
+// APP
+app_session_timeout             : 10
+app_base_url                    : http://127.0.0.1:8000
+app_assets_url                  : https://cdn.jsdelivr.net/gh/aalfiann/cdn@1.0.0/argon/assets
+
+// API
+api_url                         : http://127.0.0.1:8000/api
+api_xtoken                      : 12345678
+api_session_expires             : 60 minutes
+
+// JWT
+jwt_issuer                      : Total.js
+jwt_audience                    : localhost
+jwt_expires                     : 30d
+jwt_algorithm                   : RS256
+
+// Mail
+mail_smtp                       : smtp.yourwebsite.com
+mail_smtp_options               : {"secure":false,"port":25,"user":"","password":"","timeout":10000}
+mail_address_from               : your@yourwebsite.com
+mail_address_reply              : your@yourwebsite.com
+mail_address_copy               :

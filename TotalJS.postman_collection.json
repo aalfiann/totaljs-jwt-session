@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "425e504c-e80d-47c9-98d3-5f22be9c5a34",
+		"name": "TotalJS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x_token",
+						"value": "12345678",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"aalfiann\",\n\t\"password\":\"\",\n\t\"email\":\"aalfiann@gmail.com\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/account/register",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"account",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "x_token",
+						"type": "text",
+						"value": "12345678"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"aalfiann\",\n\t\"password\":\"123\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/account/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"account",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "x_token",
+						"type": "text",
+						"value": "12345678"
+					},
+					{
+						"key": "jwt_token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIwMTkzMTNlOS03ZDc2LTQ0MzctYTMxYS03NDUwYjk1ZTAxN2UiLCJ1bmFtZSI6ImFhbGZpYW5uIiwiaWF0IjoxNTcxMTQ4NDQyLCJleHAiOjE1NzExNDg1MDIsImF1ZCI6ImxvY2FsaG9zdCIsImlzcyI6IklNR2VleiIsInN1YiI6ImFhbGZpYW5uQGdtYWlsLmNvbSJ9.tOvVIzKCNVcRB7vZsEu4vsasLhzbOxmAyteMGJl4tKBZ_uXRzxD1DjEu9qsJMwF-pFqMhPWa0hcE8w9ZbEDyJQ",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/account/verify",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"account",
+						"verify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/account/logout",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"account",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
