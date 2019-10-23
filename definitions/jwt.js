@@ -3,6 +3,10 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
+// use 'utf8' to get string instead of byte array  (512 bit key)
+var privateKEY  = fs.readFileSync(F.path.root('jwt_private.key'), 'utf8');
+var publicKEY  = fs.readFileSync(F.path.root('jwt_public.key'), 'utf8');
+
 /**
  * Generate JWT
  * @param {object} payload 
@@ -11,9 +15,6 @@ const jwt = require('jsonwebtoken');
  * @return {callback}
  */
 function sign(payload, $Options, callback) {
-  // use 'utf8' to get string instead of byte array  (512 bit key)
-  var privateKEY  = fs.readFileSync(F.path.root('jwt_private.key'), 'utf8');
-
   // Token signing options
   var signOptions = {
       issuer:  CONF.jwt_issuer,
@@ -37,7 +38,6 @@ function sign(payload, $Options, callback) {
  * @return {callback} 
  */
 function verify(token, $Option, callback) {
-  var publicKEY  = fs.readFileSync(F.path.root('jwt_public.key'), 'utf8');
   var verifyOptions = {
       issuer:  CONF.jwt_issuer,
       subject:  $Option.subject,
