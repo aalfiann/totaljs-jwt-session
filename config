@@ -1,7 +1,7 @@
 // CORE
 name                            : Total.js
 author                          : M ABD AZIZ ALFIAN (https://github.com/aalfiann)
-version                         : 1.0.0
+version                         : 1.0.1
 nosql_cleaner                   : true
 
 // APP

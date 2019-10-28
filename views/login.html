@@ -47,21 +47,31 @@
               <div class="text-center text-muted mb-4">
                 <small>Or sign in with credentials</small>
               </div>
+              @{if model.errormessage !== ''}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span class="alert-text"><strong>@{model.errormessage}</strong></span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              @{fi}
               <form role="form" method="post">
-                <div class="form-group mb-3">
+                <div id="username_group" class="form-group mb-3">
+                  <small id="username-error" class="text-danger"></small>
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input name="username" class="form-control" placeholder="Username" type="text">
+                    <input id="username" name="username" class="form-control" placeholder="Username" type="text">
                   </div>
                 </div>
-                <div class="form-group">
+                <div id="password_group" class="form-group">
+                  <small id="password-error" class="text-danger"></small>
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input name="password" class="form-control" placeholder="Password" type="password">
+                    <input id="password" name="password" class="form-control" placeholder="Password" type="password">
                   </div>
                 </div>
                 <div class="custom-control custom-control-alternative custom-checkbox">
@@ -92,5 +102,44 @@
 @{view('partial-js')}
 @{section js}
 	<!-- Optional JS -->
-	<script src="@{CONF.app_assets_url}/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+  <script src="@{CONF.app_assets_url}/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/native-form-validation@1.0.0/dist/formvalidation.min.js"></script>
+  <script src="./js/util.js"></script>
+  <script>
+    var formVal = new FormValidation();
+    formVal.rules({
+      username: {
+        required: true,
+        message: 'Username must be lowercase, alphabet or mixed number between 3-20 chars!',
+        minLength:3,
+        maxLength:20,
+        regex: /^[a-z0-9]/,
+        errorPlace:'username-error',
+        errorAddClass: {
+          username_group:'has-danger',
+          username:'is-invalid'
+        }
+      },
+      password: {
+        required:true,
+        message:'Password must be 6-20 chars! [case-sensitive]',
+        minLength: 6,
+        maxLength: 20,
+        errorPlace:'password-error',
+        errorAddClass: {
+          password_group: 'has-danger',
+          password: 'is-invalid'
+        }
+      }
+    });
+
+    $(document).ready(function(){
+      $('#username').on('keyup', function() {
+        formVal.element('username').validate();
+      });
+      $('#password').on('keyup', function() {
+        formVal.element('password').validate();
+      });
+    });
+  </script>
 @{end}

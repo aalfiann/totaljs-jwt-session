@@ -1,3 +1,6 @@
+const app_helper = require(F.path.definitions('app_helper'));
+const jwt = require(F.path.definitions('jwt'));
+
 // Authenticate api
 MIDDLEWARE('auth_api',function($) {
     $.controller.req.headers['x_token'] = ($.controller.req.headers['x_token'] == undefined)?'':$.controller.req.headers['x_token'];
@@ -14,7 +17,6 @@ MIDDLEWARE('auth_user',function($) {
     $.controller.req.headers['jwt_token'] = ($.controller.req.headers['jwt_token'] == undefined)?'':$.controller.req.headers['jwt_token'];
     var jwt_token = $.controller.req.headers['jwt_token'];
     if(jwt_token) {
-        var jwt = require(F.path.definitions('jwt'));
         var decode = jwt.decode(jwt_token);
         if(decode) {
             jwt.verify(jwt_token,{subject:decode.payload.sub},function(err,payload) {
@@ -36,12 +38,23 @@ MIDDLEWARE('auth_user',function($) {
     }
 });
 
+// Is Admin
+MIDDLEWARE('is_admin',function($) {
+    if($.controller.repository !== undefined && $.controller.repository.payload !== undefined && $.controller.repository.payload.ids !== undefined) {
+        if(app_helper.verifyPublicRole($.controller.repository.payload.ids) === '1'){
+            $.next();
+        }
+    } else {
+        $.controller.status = 401;
+        $.controller.json({code:401,status:'error',message:'You\'re not authorized to use this API!'});
+    }
+});
+
 // Middleware for firewall in url parameter
 // Note: 
 // - this is required options.whitelist_url_parameter in controller
 // - use this for API only
 MIDDLEWARE('firewall_url_parameter',function($) {
-    var app_helper = require(F.path.definitions('app_helper'));
     var whitelist = ($.controller.route.options.whitelist_url_parameter == undefined)? []:$.controller.route.options.whitelist_url_parameter;
     if(app_helper.firewallUrlParameter($.controller.req.uri.href,whitelist)) {
         $.next();
@@ -110,9 +123,31 @@ MIDDLEWARE('session_page', function($) {
     $.next();
 });
 
-MIDDLEWARE('session_page_check', function($) {
+MIDDLEWARE('session_page_is_login', function($) {
     if($.session !== undefined && $.session.jwt_token !== undefined) {
         $.next();
+    } else {
+        var cookie = $.controller.req.cookie('__session');
+        delete SESSION_PAGE[cookie];
+        $.controller.redirect('/login');
+    }
+});
+
+MIDDLEWARE('session_page_is_admin', function($) {
+    if($.session !== undefined && $.session.jwt_token !== undefined) {
+        var decode = jwt.decode($.session.jwt_token);
+        if(decode) {
+            jwt.verify($.session.jwt_token,{subject:decode.payload.sub},function(err,payload) {
+                if(err) {
+                    console.log(err);
+                } else {
+                    if(app_helper.verifyPublicRole(payload.ids) === '1') {
+                        $.next();
+                    }
+                }
+            });
+        }
+        $.controller.redirect('/profile');
     } else {
         var cookie = $.controller.req.cookie('__session');
         delete SESSION_PAGE[cookie];

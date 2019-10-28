@@ -48,36 +48,49 @@
               <div class="text-center text-muted mb-4">
                 <small>Or sign up with credentials</small>
               </div>
-              <form role="form">
-                <div class="form-group">
+              <div id="msg"></div>
+              <form role="form" id="formRegister">
+                <div id="username_group" class="form-group">
+                  <small id="username-error" class="text-danger"></small>
                   <div class="input-group input-group-merge input-group-alternative mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Name" type="text">
+                    <input id="username" name="username" class="form-control" placeholder="Name" type="text" required>
                   </div>
                 </div>
-                <div class="form-group">
+                <div id="email_group" class="form-group">
+                  <small id="email-error" class="text-danger" for="email"></small>
                   <div class="input-group input-group-merge input-group-alternative mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Email" type="email">
+                    <input id="email" name="email" class="form-control" placeholder="Email" type="email" required>
                   </div>
                 </div>
-                <div class="form-group">
+                <div id="password_group" class="form-group">
+                  <small id="password-error" class="text-danger"></small>
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" type="password">
+                    <input id="password" name="password" class="form-control" placeholder="Password" type="password" required>
                   </div>
                 </div>
-                <div class="text-muted font-italic"><small>password strength: <span class="text-success font-weight-700">strong</span></small></div>
+                <div id="confirm_password_group" class="form-group">
+                    <small id="confirm_password-error" class="text-danger"></small>
+                    <div class="input-group input-group-merge input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                      </div>
+                      <input id="confirm_password" name="confirm_password" class="form-control" placeholder="Password" type="password" required>
+                    </div>
+                  </div>
                 <div class="row my-4">
                   <div class="col-12">
+                    <small id="checkbox-error" class="text-danger"></small>
                     <div class="custom-control custom-control-alternative custom-checkbox">
-                      <input class="custom-control-input" id="customCheckRegister" type="checkbox">
+                      <input id="customCheckRegister" class="custom-control-input" type="checkbox">
                       <label class="custom-control-label" for="customCheckRegister">
                         <span class="text-muted">I agree with the <a href="#!">Privacy Policy</a></span>
                       </label>
@@ -85,7 +98,7 @@
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="button" class="btn btn-primary mt-4">Create account</button>
+                  <button id="btnRegister" type="button" onclick="register()" class="btn btn-primary mt-4">Create account</button>
                 </div>
               </form>
             </div>
@@ -98,5 +111,118 @@
 @{view('partial-js')}
 @{section js}
 	<!-- Optional JS -->
-	<script src="@{CONF.app_assets_url}/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+  <script src="@{CONF.app_assets_url}/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/native-form-validation@1.0.0/dist/formvalidation.min.js"></script>
+  <script src="./js/util.js"></script>
+  <script>
+    var formVal = new FormValidation();
+    formVal.rules({
+      username: {
+        required: true,
+        message: 'Username must be lowercase, alphabet or mixed number between 3-20 chars!',
+        minLength:3,
+        maxLength:20,
+        regex: /^[a-z0-9]/,
+        errorPlace:'username-error',
+        errorAddClass: {
+          username_group:'has-danger',
+          username:'is-invalid'
+        }
+      },
+      email: {
+        required: true,
+        message: 'Format email is invalid!',
+        regex: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        errorPlace:'email-error',
+        errorAddClass: {
+          email_group:'has-danger',
+          email:'is-invalid'
+        }
+      },
+      password: {
+        required:true,
+        message:'Password must be 6-20 chars! [case-sensitive]',
+        minLength: 6,
+        maxLength: 20,
+        errorPlace:'password-error',
+        errorAddClass: {
+          password_group: 'has-danger',
+          password: 'is-invalid'
+        }
+      },
+      confirm_password: {
+        required:true,
+        message:'Password is not match! [case-sensitive]',
+        method: function(element) {
+          return (document.getElementById('password').value === element.value);
+        },
+        errorPlace:'confirm_password-error',
+        errorAddClass: {
+          confirm_password_group: 'has-danger',
+          confirm_password: 'is-invalid'
+        }
+      },
+      customCheckRegister: {
+        message: 'You have to agree with our privacy policy!',
+        method: function(element) {
+          return element.checked;
+        },
+        errorPlace:'checkbox-error',
+        errorAddClass: {
+          customCheckRegister:'is-invalid'
+        }
+      }
+    });
+
+    function register() {
+      var formRegister = document.getElementById('formRegister');
+      var msg = document.getElementById('msg');
+      msg.innerHTML = "";
+      if(formVal.validate().isValid()) {
+          disableClickButton('btnRegister',true,'Loading...');
+          $.ajax({
+            url:'@{CONF.api_url}/account/register',
+            method:'post',
+            headers:{
+              'content-type':'application/json',
+              'x_token':'@{CONF.api_xtoken}'
+            },
+            data:serializeFormData(formRegister)
+          }).done(function(result) {
+            if(result.status == 'success') {
+              msg.innerHTML = printAlert('success','Register successfully!');
+              formRegister.reset();
+            } else {
+              msg.innerHTML = printAlert('danger','Register failed!',result.message);
+            }
+            disableClickButton('btnRegister',false,'Create account');
+          }).fail(function(xhr) {
+            msg.innerHTML = printAlert('danger','Register failed!',xhr.responseText.message);
+            disableClickButton('btnRegister',false,'Create account');
+          });
+        }
+    }
+
+    $(document).ready(function(){
+      $('#email').on('keyup', function() {
+        formVal.element('email').validate();
+      });
+      $('#username').on('keyup', function() {
+        formVal.element('username').validate();
+      });
+      $('#password').on('keyup', function() {
+        formVal.element('password').validate();
+        formVal.element('confirm_password').validate();
+      });
+      $('#confirm_password').on('keyup', function() {
+        formVal.element('confirm_password').validate();
+      });
+      $('#customCheckRegister').on('keyup', function() {
+        formVal.element('customCheckRegister').validate();
+      });
+      $('#customCheckRegister').on('keydown', function() {
+        formVal.element('customCheckRegister').validate();
+      });
+    });
+  </script>
 @{end}

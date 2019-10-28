@@ -2,6 +2,28 @@
 
 const bcrypt = require('bcryptjs');
 const ParallelRequest = require('parallel-http-request');
+const Hashids = require('hashids/cjs');
+const hashids = new Hashids();
+
+module.exports = {
+    scalarArrayToObject,
+    scalarObjectToArray,
+    sumScalarObject,
+    schemaErrorBuilder,
+    builderErrorResponse,
+    successResponse,
+    failResponse,
+    customResponse,
+    firstHour,
+    lastHour,
+    timestamp,
+    firewallUrlParameter,
+    cryptPassword,
+    comparePassword,
+    requestHttp,
+    generatePublicRole,
+    verifyPublicRole
+}
 
 /**
  * Convert scalar object to array
@@ -296,20 +318,20 @@ function requestHttp(url,method,headers,body,callback) {
 	});
 }
 
-module.exports = {
-    scalarArrayToObject,
-    scalarObjectToArray,
-    sumScalarObject,
-    schemaErrorBuilder,
-    builderErrorResponse,
-    successResponse,
-    failResponse,
-    customResponse,
-    firstHour,
-    lastHour,
-    timestamp,
-    firewallUrlParameter,
-    cryptPassword,
-    comparePassword,
-    requestHttp
+/**
+ * Generate Public Role for JWT
+ * @param {int} num
+ * @return {string} 
+ */
+function generatePublicRole(num) {
+    return hashids.encode(num+''+Date.now());
+}
+
+/**
+ * Verify Public Role from JWT
+ * @param {string} data
+ * @return {string} 
+ */
+function verifyPublicRole(data) {
+    return hashids.decode(data.toString()).toString().charAt(0);
 }

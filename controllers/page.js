@@ -1,11 +1,12 @@
 exports.install = function() {
 
 	ROUTE('/', function(){this.view('index')});
-	ROUTE('/login', function(){this.view('login')},['#session_page']);
+	ROUTE('/login', function(){this.view('login',{errormessage:''})},['#session_page']);
 	ROUTE('/login', login, ['post','#session_page']);
 	ROUTE('/logout', logout, ['#session_page']);
 	ROUTE('/register', function(){this.view('register')});
-	ROUTE('/profile', function(){this.view('user-profile')},['#session_page','#session_page_check']);
+	ROUTE('/profile', function(){this.view('user-profile')},['#session_page','#session_page_is_login']);
+	ROUTE('/admin', function(){this.view('user-profile')},['#session_page','#session_page_is_login','#session_page_is_admin']);
 
 };
 
@@ -25,11 +26,13 @@ function login() {
 					console.log(err);
 				}
 			}
-			if(response !== undefined && response.code == 200) {
+			if(response !== undefined && response.code == 200 && response.status=='success') {
 				self.session.jwt_token = response.response.jwt_token;
 				self.redirect('/profile');
 			} else {
-				self.redirect('/login');
+				self.view('login',{
+					errormessage:response.message
+				});
 			}
 		});
 	}

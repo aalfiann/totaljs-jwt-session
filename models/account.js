@@ -41,18 +41,39 @@ NEWSCHEMA('Account').make(function(schema) {
                 } else {
                     helper.cryptPassword(data.password,function(err,hash) {
                         if(err) helper.customResponse($,409,'error','Failed to encrypt password!',err,true);
-                        nosql.insert({
+
+                        var inputdata = {
                             id:uuidv4(),
                             username:username,
                             hash:hash,
                             email:data.email,
                             date_created:Date.now()
-                        }).callback(function(err) {
-                            if(err) {
-                                helper.builderErrorResponse($,err);
-                            } else {
-                                helper.successResponse($,'Register is successfully!');
-                            }
+                        };
+                        
+                        nosql.find().make(function(builder) {
+                            builder.where('role', '1');
+                            builder.callback(function(err, response, count) {
+                                if(err) helper.builderErrorResponse($,err);
+                                if(count) {
+                                    inputdata.role = '2';
+                                    nosql.insert(inputdata).callback(function(err) {
+                                        if(err) {
+                                            helper.builderErrorResponse($,err);
+                                        } else {
+                                            helper.successResponse($,'Register is successfully!');
+                                        }
+                                    });
+                                } else {
+                                    inputdata.role = '1';
+                                    nosql.insert(inputdata).callback(function(err) {
+                                        if(err) {
+                                            helper.builderErrorResponse($,err);
+                                        } else {
+                                            helper.successResponse($,'Register is successfully!');
+                                        }
+                                    });
+                                }
+                            });
                         });
                     });
                 }
@@ -74,7 +95,8 @@ NEWSCHEMA('Account').make(function(schema) {
                         if(isPasswordMatch) {
                             var payload = {
                                 uid:user.id,
-                                uname:user.username
+                                uname:user.username,
+                                ids:helper.generatePublicRole(user.role)
                             };
                         
                             var options = {
@@ -113,7 +135,6 @@ NEWSCHEMA('Account').make(function(schema) {
         helper.successResponse($,'Signature is valid',{payload:$.controller.repository.payload});
     });
 
-    // Performs logout
 	schema.addWorkflow('logout', function($) {
 		// Removes session if any
 		MAIN.session.remove2($.controller.repository.payload.uid,function(err,count) {
